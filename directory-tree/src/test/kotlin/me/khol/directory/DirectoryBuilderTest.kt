@@ -1,6 +1,7 @@
 package me.khol.directory
 
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
@@ -226,42 +227,45 @@ class DirectoryBuilderTest {
     }
 
     @Test
-    @DisplayName("complex directories with files")
-    fun complexDirectoriesWithFiles() {
+    @DisplayName("shorthand directories")
+    fun shorthandDirectories() {
         expectThat(
             directory {
-                directory("featureOne") {
-                    file("build.gradle.kts")
-                }
-                directory("featureTwo") {
-                    file("build.gradle.kts")
-                }
-                directory("gradle-common") {
-                    file("build.gradle.kts")
-                    directory("src") {
-                        directory("main") {
-                            directory("kotlin") {
-                                directory("com") {
-                                    directory("sample") {
-                                        directory("gradle") {
-                                            directory("android") {
-                                                file("library.gradle.kts")
-                                            }
-                                            directory("jacoco") {
-                                                file("android.gradle.kts")
-                                            }
-                                            directory("sonarqube") {
-                                                file("android.gradle.kts")
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                directory("one", "two", "three") {
+                    file("file.txt")
                 }
             }
         ).isEqualTo(
+            """
+            ╰── one
+                ╰── two
+                    ╰── three
+                        ╰── file.txt
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    @DisplayName("shorthand files")
+    fun shorthandFiles() {
+        expectThat(
+            directory {
+                file("one", "two", "three", "file.txt")
+            }
+        ).isEqualTo(
+            """
+            ╰── one
+                ╰── two
+                    ╰── three
+                        ╰── file.txt
+            """.trimIndent()
+        )
+    }
+
+    @Nested
+    @DisplayName("complex directories with files")
+    inner class ComplexDirectories {
+        private val expected =
             """
             ├── featureOne
             │   ╰── build.gradle.kts
@@ -282,6 +286,63 @@ class DirectoryBuilderTest {
                                         ╰── sonarqube
                                             ╰── android.gradle.kts
             """.trimIndent()
-        )
+
+        @Test
+        @DisplayName("with shorthand expressions")
+        fun withShorthandExpressions() {
+            expectThat(
+                directory {
+                    file("featureOne", "build.gradle.kts")
+                    file("featureTwo", "build.gradle.kts")
+                    directory("gradle-common") {
+                        file("build.gradle.kts")
+                        directory("src", "main", "kotlin", "com", "sample", "gradle") {
+                            file("android", "library.gradle.kts")
+                            file("jacoco", "android.gradle.kts")
+                            file("sonarqube", "android.gradle.kts")
+                        }
+                    }
+                }
+            ).isEqualTo(expected)
+        }
+
+        @Test
+        @DisplayName("without shorthand expressions")
+        fun withoutShorthandExpressions() {
+            expectThat(
+                directory {
+                    directory("featureOne") {
+                        file("build.gradle.kts")
+                    }
+                    directory("featureTwo") {
+                        file("build.gradle.kts")
+                    }
+                    directory("gradle-common") {
+                        file("build.gradle.kts")
+                        directory("src") {
+                            directory("main") {
+                                directory("kotlin") {
+                                    directory("com") {
+                                        directory("sample") {
+                                            directory("gradle") {
+                                                directory("android") {
+                                                    file("library.gradle.kts")
+                                                }
+                                                directory("jacoco") {
+                                                    file("android.gradle.kts")
+                                                }
+                                                directory("sonarqube") {
+                                                    file("android.gradle.kts")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ).isEqualTo(expected)
+        }
     }
 }

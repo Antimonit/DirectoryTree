@@ -5,9 +5,9 @@ import me.khol.directory.internal.Separator
 
 interface DirectoryScope {
 
-    fun file(name: String)
+    fun file(name: String, vararg names: String)
 
-    fun directory(name: String, block: DirectoryScope.() -> Unit = {})
+    fun directory(name: String, vararg names: String, block: DirectoryScope.() -> Unit = {})
 }
 
 fun directory(block: DirectoryScope.() -> Unit): String =

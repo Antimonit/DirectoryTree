@@ -7,12 +7,24 @@ internal class DirectoryTreeBuilder internal constructor(
 ) : DirectoryScope {
     private val nodes = mutableListOf<Node>()
 
-    override fun file(name: String) {
-        nodes += Node.File(name = name)
+    override fun file(name: String, vararg names: String) {
+        nodes += if (names.isEmpty()) {
+            Node.File(name = name)
+        } else {
+            DirectoryTreeBuilder(name).also {
+                it.file(names.first(), *names.drop(1).toTypedArray())
+            }.build()
+        }
     }
 
-    override fun directory(name: String, block: DirectoryScope.() -> Unit) {
-        nodes += DirectoryTreeBuilder(name).also(block).build()
+    override fun directory(name: String, vararg names: String, block: DirectoryScope.() -> Unit) {
+        nodes += if (names.isEmpty()) {
+            DirectoryTreeBuilder(name).also(block).build()
+        } else {
+            DirectoryTreeBuilder(name).also {
+                it.directory(names.first(), *names.drop(1).toTypedArray(), block = block)
+            }.build()
+        }
     }
 
     internal fun build() = Node.Directory(name = name, nodes = nodes)
