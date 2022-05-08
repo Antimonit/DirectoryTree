@@ -1,13 +1,7 @@
 plugins {
     kotlin("jvm") version "1.6.20"
     jacoco
-}
-
-group = "me.khol"
-version = "1.0"
-
-repositories {
-    mavenCentral()
+    id("com.vanniktech.maven.publish")
 }
 
 dependencies {
@@ -24,4 +18,8 @@ tasks.jacocoTestReport {
     reports {
         xml.required.set(true)
     }
+}
+
+mavenPublish {
+    sonatypeHost = com.vanniktech.maven.publish.SonatypeHost.S01
 }
