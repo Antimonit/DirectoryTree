@@ -1,1 +1,1 @@
-rootProject.name = "DirectoryTree"
+include("directory-tree")
