@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.6.20"
+    jacoco
 }
 
 group = "me.khol"
@@ -17,4 +18,10 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required.set(true)
+    }
 }
