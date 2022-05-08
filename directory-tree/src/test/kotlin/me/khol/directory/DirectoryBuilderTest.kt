@@ -307,6 +307,31 @@ class DirectoryBuilderTest {
         }
 
         @Test
+        @DisplayName("with mixed expressions")
+        fun withMixedExpressions() {
+            expectThat(
+                directory {
+                    directory("featureOne") {
+                        file("build.gradle.kts")
+                    }
+                    directory("featureTwo") {
+                        file("build.gradle.kts")
+                    }
+                    directory("gradle-common") {
+                        file("build.gradle.kts")
+                        directory("src", "main", "kotlin") {
+                            directory("com", "sample", "gradle") {
+                                file("android", "library.gradle.kts")
+                                file("jacoco", "android.gradle.kts")
+                                file("sonarqube", "android.gradle.kts")
+                            }
+                        }
+                    }
+                }
+            ).isEqualTo(expected)
+        }
+
+        @Test
         @DisplayName("without shorthand expressions")
         fun withoutShorthandExpressions() {
             expectThat(
