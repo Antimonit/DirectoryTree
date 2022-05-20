@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.ParameterizedTest.ARGUMENTS_WITH_NAMES_PLACEHOLDER
 import org.junit.jupiter.params.ParameterizedTest.DISPLAY_NAME_PLACEHOLDER
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
@@ -361,6 +362,200 @@ class DirectoryBuilderTest {
                 }
             }.trimIndent()
         )
+    }
+
+    @Nested
+    @DisplayName("Compact modes")
+    inner class CompactModes {
+
+        @ParameterizedTest(name = "$DISPLAY_NAME_PLACEHOLDER: $ARGUMENTS_WITH_NAMES_PLACEHOLDER")
+        @EnumSource
+        @DisplayName("Directories only")
+        fun directory(compactMode: CompactMode) {
+            expectThat(
+                directory(
+                    DirectoryContext(compactMode = compactMode)
+                ) {
+                    directory("one") {
+                        directory("two", "three")
+                    }
+                }
+            ).isEqualTo(
+                when (compactMode) {
+                    CompactMode.NONE -> """
+                        ╰── one
+                            ╰── two
+                                ╰── three
+                        """
+                    CompactMode.EXACT -> """
+                        ╰── one
+                            ╰── two/three
+                        """
+                    CompactMode.DIRECTORIES -> """
+                        ╰── one/two/three
+                        """
+                    CompactMode.ALL -> """
+                        ╰── one/two/three
+                        """
+                }.trimIndent()
+            )
+        }
+
+        @ParameterizedTest(name = "$DISPLAY_NAME_PLACEHOLDER: $ARGUMENTS_WITH_NAMES_PLACEHOLDER")
+        @EnumSource
+        @DisplayName("File in a directory")
+        fun fileInDirectory(compactMode: CompactMode) {
+            expectThat(
+                directory(
+                    DirectoryContext(compactMode = compactMode)
+                ) {
+                    directory("one") {
+                        file("two", "three", "file.txt")
+                    }
+                }
+            ).isEqualTo(
+                when (compactMode) {
+                    CompactMode.NONE -> """
+                        ╰── one
+                            ╰── two
+                                ╰── three
+                                    ╰── file.txt
+                        """
+                    CompactMode.EXACT -> """
+                        ╰── one
+                            ╰── two/three/file.txt
+                        """
+                    CompactMode.DIRECTORIES -> """
+                        ╰── one/two/three
+                            ╰── file.txt
+                        """
+                    CompactMode.ALL -> """
+                        ╰── one/two/three/file.txt
+                        """
+                }.trimIndent()
+            )
+        }
+
+        @ParameterizedTest(name = "$DISPLAY_NAME_PLACEHOLDER: $ARGUMENTS_WITH_NAMES_PLACEHOLDER")
+        @EnumSource
+        @DisplayName("File in the root directory")
+        fun fileInRoot(compactMode: CompactMode) {
+            expectThat(
+                directory(
+                    DirectoryContext(compactMode = compactMode)
+                ) {
+                    file("one", "two", "three", "file.txt")
+                }
+            ).isEqualTo(
+                when (compactMode) {
+                    CompactMode.NONE -> """
+                        ╰── one
+                            ╰── two
+                                ╰── three
+                                    ╰── file.txt
+                        """
+                    CompactMode.EXACT -> """
+                        ╰── one/two/three/file.txt
+                        """
+                    CompactMode.DIRECTORIES -> """
+                        ╰── one/two/three
+                            ╰── file.txt
+                        """
+                    CompactMode.ALL -> """
+                        ╰── one/two/three/file.txt
+                        """
+                }.trimIndent()
+            )
+        }
+
+        @ParameterizedTest(name = "$DISPLAY_NAME_PLACEHOLDER: $ARGUMENTS_WITH_NAMES_PLACEHOLDER")
+        @EnumSource
+        @DisplayName("Complex hierarchy")
+        fun complex(compactMode: CompactMode) {
+            expectThat(
+                directory(
+                    DirectoryContext(compactMode = compactMode)
+                ) {
+                    directory("featureOne") {
+                        file("build.gradle.kts")
+                    }
+                    directory("featureTwo") {
+                        file("build.gradle.kts")
+                    }
+                    directory("gradle-common") {
+                        file("build.gradle.kts")
+                        directory("src", "main", "kotlin") {
+                            directory("com", "sample", "gradle") {
+                                file("android", "library.gradle.kts")
+                                file("jacoco", "android.gradle.kts")
+                                file("sonarqube", "android.gradle.kts")
+                            }
+                        }
+                    }
+                }
+            ).isEqualTo(
+                when (compactMode) {
+                    CompactMode.NONE -> """
+                            ├── featureOne
+                            │   ╰── build.gradle.kts
+                            ├── featureTwo
+                            │   ╰── build.gradle.kts
+                            ╰── gradle-common
+                                ├── build.gradle.kts
+                                ╰── src
+                                    ╰── main
+                                        ╰── kotlin
+                                            ╰── com
+                                                ╰── sample
+                                                    ╰── gradle
+                                                        ├── android
+                                                        │   ╰── library.gradle.kts
+                                                        ├── jacoco
+                                                        │   ╰── android.gradle.kts
+                                                        ╰── sonarqube
+                                                            ╰── android.gradle.kts
+                            """
+                    CompactMode.EXACT -> """
+                            ├── featureOne
+                            │   ╰── build.gradle.kts
+                            ├── featureTwo
+                            │   ╰── build.gradle.kts
+                            ╰── gradle-common
+                                ├── build.gradle.kts
+                                ╰── src/main/kotlin
+                                    ╰── com/sample/gradle
+                                        ├── android/library.gradle.kts
+                                        ├── jacoco/android.gradle.kts
+                                        ╰── sonarqube/android.gradle.kts
+                            """
+                    CompactMode.DIRECTORIES -> """
+                            ├── featureOne
+                            │   ╰── build.gradle.kts
+                            ├── featureTwo
+                            │   ╰── build.gradle.kts
+                            ╰── gradle-common
+                                ├── build.gradle.kts
+                                ╰── src/main/kotlin/com/sample/gradle
+                                    ├── android
+                                    │   ╰── library.gradle.kts
+                                    ├── jacoco
+                                    │   ╰── android.gradle.kts
+                                    ╰── sonarqube
+                                        ╰── android.gradle.kts
+                            """
+                    CompactMode.ALL -> """
+                            ├── featureOne/build.gradle.kts
+                            ├── featureTwo/build.gradle.kts
+                            ╰── gradle-common
+                                ├── build.gradle.kts
+                                ╰── src/main/kotlin/com/sample/gradle
+                                    ├── android/library.gradle.kts
+                                    ├── jacoco/android.gradle.kts
+                                    ╰── sonarqube/android.gradle.kts
+                            """
+                }.trimIndent()
+            )
+        }
     }
 
     @Nested

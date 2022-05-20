@@ -6,7 +6,7 @@ import me.khol.directory.internal.Separator
 fun directory(
     context: DirectoryContext = DirectoryContext(),
     block: DirectoryScope.() -> Unit,
-): String = DirectoryTreeBuilder(context = context, name = "root")
+): String = DirectoryTreeBuilder(context = context, name = "")
     .also(block)
     .build()
     .toLines()

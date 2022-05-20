@@ -4,15 +4,21 @@ sealed interface Node {
 
     val name: String
 
+    fun toLines(): Hierarchy
+
     fun toHierarchy(delimiter: Separator, tab: Separator): Hierarchy
 
     class File(
         override val name: String,
     ) : Node {
 
-        override fun toHierarchy(delimiter: Separator, tab: Separator) = listOf(
-            Line(separators = listOf(delimiter), name = name)
+        override fun toLines(): Hierarchy = listOf(
+            Line(separators = emptyList(), name = name)
         )
+
+        override fun toHierarchy(delimiter: Separator, tab: Separator) = toLines().map { line ->
+            line.copy(separators = listOf(delimiter) + line.separators)
+        }
     }
 
     class Directory(
@@ -20,7 +26,7 @@ sealed interface Node {
         val nodes: List<Node>,
     ) : Node {
 
-        fun toLines(): Hierarchy {
+        override fun toLines(): Hierarchy {
             fun List<Node>.lines(delimiter: Separator, tab: Separator) =
                 flatMap { it.toHierarchy(delimiter, tab) }
 
