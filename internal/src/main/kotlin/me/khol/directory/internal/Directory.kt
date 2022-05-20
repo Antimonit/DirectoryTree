@@ -1,6 +1,6 @@
 package me.khol.directory.internal
 
-internal sealed interface Node {
+sealed interface Node {
 
     fun toHierarchy(delimiter: Separator, tab: Separator): Hierarchy
 

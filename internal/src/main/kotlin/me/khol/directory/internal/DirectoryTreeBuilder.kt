@@ -2,7 +2,7 @@ package me.khol.directory.internal
 
 import me.khol.directory.DirectoryScope
 
-internal class DirectoryTreeBuilder internal constructor(
+class DirectoryTreeBuilder(
     private val name: String,
 ) : DirectoryScope {
     private val nodes = mutableListOf<Node>()
@@ -27,5 +27,5 @@ internal class DirectoryTreeBuilder internal constructor(
         }
     }
 
-    internal fun build() = Node.Directory(name = name, nodes = nodes)
+    fun build() = Node.Directory(name = name, nodes = nodes)
 }

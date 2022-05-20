@@ -1,1 +1,3 @@
-include("directory-tree")
+include("shared")
+include("internal")
+include("api")
