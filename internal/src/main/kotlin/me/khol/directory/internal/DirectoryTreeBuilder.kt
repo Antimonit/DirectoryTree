@@ -2,6 +2,7 @@ package me.khol.directory.internal
 
 import me.khol.directory.DirectoryContext
 import me.khol.directory.DirectoryScope
+import me.khol.directory.SortMode
 
 class DirectoryTreeBuilder(
     private val context: DirectoryContext,
@@ -32,16 +33,24 @@ class DirectoryTreeBuilder(
 
     fun build() = Node.Directory(
         name = name,
-        nodes = nodes.run {
-            when (context.directoriesFirst) {
-                true -> partition {
-                    when (it) { // exhaustive and future-proof
-                        is Node.Directory -> true
-                        is Node.File -> false
-                    }
-                }.let { it.first + it.second }
-                false -> this
+        nodes = nodes
+            .run {
+                when (context.sortMode) {
+                    SortMode.NONE -> this
+                    SortMode.ASC -> sortedBy(Node::name)
+                    SortMode.DESC -> sortedByDescending(Node::name)
+                }
             }
-        }
+            .run {
+                when (context.directoriesFirst) {
+                    true -> partition {
+                        when (it) { // exhaustive and future-proof
+                            is Node.Directory -> true
+                            is Node.File -> false
+                        }
+                    }.let { it.first + it.second }
+                    false -> this
+                }
+            }
     )
 }
