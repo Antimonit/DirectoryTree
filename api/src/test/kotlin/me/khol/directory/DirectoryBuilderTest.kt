@@ -3,14 +3,18 @@ package me.khol.directory
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.ParameterizedTest.ARGUMENTS_WITH_NAMES_PLACEHOLDER
+import org.junit.jupiter.params.ParameterizedTest.DISPLAY_NAME_PLACEHOLDER
+import org.junit.jupiter.params.provider.MethodSource
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
-@DisplayName("directory builder")
+@DisplayName("Directory builder")
 class DirectoryBuilderTest {
 
     @Test
-    @DisplayName("empty root directory")
+    @DisplayName("Empty root directory")
     fun emptyRootDirectory() {
         expectThat(
             directory {
@@ -22,7 +26,7 @@ class DirectoryBuilderTest {
     }
 
     @Test
-    @DisplayName("single file")
+    @DisplayName("Single file")
     fun singleFile() {
         expectThat(
             directory {
@@ -36,7 +40,7 @@ class DirectoryBuilderTest {
     }
 
     @Test
-    @DisplayName("multiple files")
+    @DisplayName("Multiple files")
     fun multipleFiles() {
         expectThat(
             directory {
@@ -54,7 +58,7 @@ class DirectoryBuilderTest {
     }
 
     @Test
-    @DisplayName("single directory")
+    @DisplayName("Single directory")
     fun singleDirectory() {
         expectThat(
             directory {
@@ -68,7 +72,7 @@ class DirectoryBuilderTest {
     }
 
     @Test
-    @DisplayName("multiple directories")
+    @DisplayName("Multiple directories")
     fun multipleDirectories() {
         expectThat(
             directory {
@@ -86,7 +90,7 @@ class DirectoryBuilderTest {
     }
 
     @Test
-    @DisplayName("nested directories")
+    @DisplayName("Nested directories")
     fun nestedDirectories() {
         expectThat(
             directory {
@@ -106,7 +110,7 @@ class DirectoryBuilderTest {
     }
 
     @Test
-    @DisplayName("multiple nested directories")
+    @DisplayName("Multiple nested directories")
     fun multipleNestedDirectories() {
         expectThat(
             directory {
@@ -152,7 +156,7 @@ class DirectoryBuilderTest {
     }
 
     @Test
-    @DisplayName("non-uniform directories")
+    @DisplayName("Non-uniform directories")
     fun nonUniformDirectories() {
         expectThat(
             directory {
@@ -189,7 +193,7 @@ class DirectoryBuilderTest {
     }
 
     @Test
-    @DisplayName("file then directory")
+    @DisplayName("File then directory")
     fun fileThenDirectory() {
         expectThat(
             directory {
@@ -208,7 +212,7 @@ class DirectoryBuilderTest {
     }
 
     @Test
-    @DisplayName("directory then file")
+    @DisplayName("Directory then file")
     fun directoryThenFile() {
         expectThat(
             directory {
@@ -227,7 +231,7 @@ class DirectoryBuilderTest {
     }
 
     @Test
-    @DisplayName("shorthand directories")
+    @DisplayName("Shorthand directories")
     fun shorthandDirectories() {
         expectThat(
             directory {
@@ -246,7 +250,7 @@ class DirectoryBuilderTest {
     }
 
     @Test
-    @DisplayName("shorthand files")
+    @DisplayName("Shorthand files")
     fun shorthandFiles() {
         expectThat(
             directory {
@@ -262,8 +266,105 @@ class DirectoryBuilderTest {
         )
     }
 
+    companion object {
+        @JvmStatic
+        fun sortByNameAndDirectoriesFirst() = arrayOf(
+            arrayOf(SortMode.NONE, false),
+            arrayOf(SortMode.NONE, true),
+            arrayOf(SortMode.ASC, false),
+            arrayOf(SortMode.ASC, true),
+            arrayOf(SortMode.DESC, false),
+            arrayOf(SortMode.DESC, true),
+        )
+    }
+
+    @ParameterizedTest(name = "$DISPLAY_NAME_PLACEHOLDER ($ARGUMENTS_WITH_NAMES_PLACEHOLDER)")
+    @MethodSource
+    @DisplayName("Sort by name & directoriesFirst")
+    fun sortByNameAndDirectoriesFirst(sortMode: SortMode, directoriesFirst: Boolean) {
+        expectThat(
+            directory(
+                context = DirectoryContext(
+                    sortMode = sortMode,
+                    directoriesFirst = directoriesFirst,
+                )
+            ) {
+                file("z.txt")
+                directory("one") {
+                    directory("two") {
+                        file("one.txt")
+                        file("two.txt")
+                        file("three.txt")
+                    }
+                }
+                file("a.txt")
+            }
+        ).isEqualTo(
+            when (directoriesFirst) {
+                true -> when (sortMode) {
+                    SortMode.NONE -> """
+                        ├── one
+                        │   ╰── two
+                        │       ├── one.txt
+                        │       ├── two.txt
+                        │       ╰── three.txt
+                        ├── z.txt
+                        ╰── a.txt
+                        """
+                    SortMode.ASC -> """
+                        ├── one
+                        │   ╰── two
+                        │       ├── one.txt
+                        │       ├── three.txt
+                        │       ╰── two.txt
+                        ├── a.txt
+                        ╰── z.txt
+                        """
+                    SortMode.DESC -> """
+                        ├── one
+                        │   ╰── two
+                        │       ├── two.txt
+                        │       ├── three.txt
+                        │       ╰── one.txt
+                        ├── z.txt
+                        ╰── a.txt
+                        """
+                }
+                false -> when (sortMode) {
+                    SortMode.NONE -> """
+                        ├── z.txt
+                        ├── one
+                        │   ╰── two
+                        │       ├── one.txt
+                        │       ├── two.txt
+                        │       ╰── three.txt
+                        ╰── a.txt
+                        """
+                    SortMode.ASC -> """
+                        ├── a.txt
+                        ├── one
+                        │   ╰── two
+                        │       ├── one.txt
+                        │       ├── three.txt
+                        │       ╰── two.txt
+                        ╰── z.txt
+                        """
+                    SortMode.DESC -> """
+                        ├── z.txt
+                        ├── one
+                        │   ╰── two
+                        │       ├── two.txt
+                        │       ├── three.txt
+                        │       ╰── one.txt
+                        ╰── a.txt
+                        """
+                }
+            }.trimIndent()
+        )
+    }
+
     @Nested
-    @DisplayName("complex directories with files")
+    @DisplayName("Complex directories with files")
     inner class ComplexDirectories {
         private val expected =
             """
@@ -288,7 +389,7 @@ class DirectoryBuilderTest {
             """.trimIndent()
 
         @Test
-        @DisplayName("with shorthand expressions")
+        @DisplayName("With shorthand expressions")
         fun withShorthandExpressions() {
             expectThat(
                 directory {
@@ -307,7 +408,7 @@ class DirectoryBuilderTest {
         }
 
         @Test
-        @DisplayName("with mixed expressions")
+        @DisplayName("With mixed expressions")
         fun withMixedExpressions() {
             expectThat(
                 directory {
@@ -332,7 +433,7 @@ class DirectoryBuilderTest {
         }
 
         @Test
-        @DisplayName("without shorthand expressions")
+        @DisplayName("Without shorthand expressions")
         fun withoutShorthandExpressions() {
             expectThat(
                 directory {
