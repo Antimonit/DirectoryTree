@@ -91,6 +91,7 @@ class DirectoryTreeBuilder(
 
         return Node.Directory(
             name = name,
+            separators = context.separators,
             nodes = nodes
                 .run {
                     when (context.sortMode) {

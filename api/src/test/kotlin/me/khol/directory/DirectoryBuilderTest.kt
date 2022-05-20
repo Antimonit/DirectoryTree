@@ -267,6 +267,37 @@ class DirectoryBuilderTest {
         )
     }
 
+    @Test
+    @DisplayName("Custom separators")
+    fun customSeparators() {
+        expectThat(
+            directory(
+                DirectoryContext(
+                    separators = Separators(
+                        empty = "   ",
+                        pipe = "║  ",
+                        split = "╟─╴",
+                        corner = "╙─╴",
+                    )
+                )
+            ) {
+                directory("one") {
+                    file("file.txt")
+                }
+                directory("two") {
+                    file("file.txt")
+                }
+            }
+        ).isEqualTo(
+            """
+            ╟─╴one
+            ║  ╙─╴file.txt
+            ╙─╴two
+               ╙─╴file.txt
+            """.trimIndent()
+        )
+    }
+
     companion object {
         @JvmStatic
         fun sortByNameAndDirectoriesFirst() = arrayOf(

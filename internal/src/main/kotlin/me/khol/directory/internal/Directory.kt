@@ -1,5 +1,8 @@
 package me.khol.directory.internal
 
+import me.khol.directory.Separator
+import me.khol.directory.Separators
+
 sealed interface Node {
 
     val name: String
@@ -23,6 +26,7 @@ sealed interface Node {
 
     class Directory(
         override val name: String,
+        private val separators: Separators,
         val nodes: List<Node>,
     ) : Node {
 
@@ -32,8 +36,8 @@ sealed interface Node {
 
             val head = nodes.dropLast(1)
             val tail = nodes.takeLast(1)
-            return head.lines(Separator.SPLIT, Separator.PIPE) +
-                    tail.lines(Separator.CORNER, Separator.EMPTY)
+            return head.lines(separators.split, separators.pipe) +
+                    tail.lines(separators.corner, separators.empty)
         }
 
         override fun toHierarchy(delimiter: Separator, tab: Separator) =
