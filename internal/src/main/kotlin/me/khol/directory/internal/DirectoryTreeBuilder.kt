@@ -12,6 +12,7 @@ class DirectoryTreeBuilder(
     private val nodes = mutableListOf<Node>()
 
     override fun file(name: String, vararg names: String) {
+        require(name.isNotEmpty()) { "Name of a file must not be empty" }
         nodes += if (names.isEmpty()) {
             Node.File(name = name)
         } else {
@@ -22,6 +23,7 @@ class DirectoryTreeBuilder(
     }
 
     override fun directory(name: String, vararg names: String, block: DirectoryScope.() -> Unit) {
+        require(name.isNotEmpty()) { "Name of a directory must not be empty" }
         nodes += if (names.isEmpty()) {
             DirectoryTreeBuilder(context, name).also(block).build()
         } else {
