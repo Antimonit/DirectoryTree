@@ -51,12 +51,7 @@ kotlin {
             }
         }
         named("jvmMain")
-        named("jvmTest") {
-            dependencies {
-                implementation(kotlin("test-junit5"))
-                implementation("org.junit.jupiter:junit-jupiter:5.8.2")
-            }
-        }
+        named("jvmTest")
         named("jsMain")
         named("jsTest")
         named("nativeMain")
