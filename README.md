@@ -1,7 +1,8 @@
+![Maven Central](https://img.shields.io/badge/Kotlin-Multiplatform-blueviolet)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.antimonit/directory-tree.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.antimonit%22%20AND%20a:%22directory-tree%22)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![CircleCI](https://circleci.com/gh/Antimonit/DirectoryTree/tree/main.svg?style=shield)](https://circleci.com/gh/Antimonit/DirectoryTree/tree/main)
-[![codecov](https://codecov.io/gh/Antimonit/DirectoryTree/branch/main/graph/badge.svg?token=ZK4VJZSPFI)](https://codecov.io/gh/Antimonit/DirectoryTree)
+[![CircleCI](https://img.shields.io/circleci/build/gh/Antimonit/DirectoryTree?label=CircleCI)](https://circleci.com/gh/Antimonit/DirectoryTree/tree/main)
+[![Codecov](https://img.shields.io/codecov/c/gh/Antimonit/DirectoryTree?label=Codecov)](https://codecov.io/gh/Antimonit/DirectoryTree)
 
 # DirectoryTree
 
@@ -303,8 +304,9 @@ directory(
 
 # Download
 
-The library is available from the MavenCentral repository:
+The library is available from the MavenCentral repository as a Kotlin Multiplatform library targeting JVM, JS and 
+native:
 
 ```kotlin
-implementation("io.github.antimonit:directory-tree:1.2.0")
+implementation("io.github.antimonit:directory-tree:1.3.0")
 ```
