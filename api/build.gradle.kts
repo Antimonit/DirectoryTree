@@ -55,7 +55,6 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-junit5"))
                 implementation("org.junit.jupiter:junit-jupiter:5.8.2")
-                implementation("io.strikt:strikt-core:0.34.1")
             }
         }
         named("jsMain")

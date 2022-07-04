@@ -8,8 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest.ARGUMENTS_WITH_NAMES_PLACEHOLD
 import org.junit.jupiter.params.ParameterizedTest.DISPLAY_NAME_PLACEHOLDER
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
-import strikt.api.expectThat
-import strikt.assertions.isEqualTo
+import kotlin.test.assertEquals
 
 @DisplayName("Directory builder")
 class DirectoryBuilderTest {
@@ -17,10 +16,9 @@ class DirectoryBuilderTest {
     @Test
     @DisplayName("Empty root directory")
     fun emptyRootDirectory() {
-        expectThat(
+        assertEquals(
             directory {
-            }
-        ).isEqualTo(
+            },
             """
             """.trimIndent()
         )
@@ -29,11 +27,10 @@ class DirectoryBuilderTest {
     @Test
     @DisplayName("Single file")
     fun singleFile() {
-        expectThat(
+        assertEquals(
             directory {
                 file("file.txt")
-            }
-        ).isEqualTo(
+            },
             """
             ╰── file.txt
             """.trimIndent()
@@ -43,13 +40,12 @@ class DirectoryBuilderTest {
     @Test
     @DisplayName("Multiple files")
     fun multipleFiles() {
-        expectThat(
+        assertEquals(
             directory {
                 file("file_one.txt")
                 file("file_two.txt")
                 file("file_three.txt")
-            }
-        ).isEqualTo(
+            },
             """
             ├── file_one.txt
             ├── file_two.txt
@@ -61,11 +57,10 @@ class DirectoryBuilderTest {
     @Test
     @DisplayName("Single directory")
     fun singleDirectory() {
-        expectThat(
+        assertEquals(
             directory {
                 directory("folder")
-            }
-        ).isEqualTo(
+            },
             """
             ╰── folder
             """.trimIndent()
@@ -75,13 +70,12 @@ class DirectoryBuilderTest {
     @Test
     @DisplayName("Multiple directories")
     fun multipleDirectories() {
-        expectThat(
+        assertEquals(
             directory {
                 directory("one")
                 directory("two")
                 directory("three")
-            }
-        ).isEqualTo(
+            },
             """
             ├── one
             ├── two
@@ -93,15 +87,14 @@ class DirectoryBuilderTest {
     @Test
     @DisplayName("Nested directories")
     fun nestedDirectories() {
-        expectThat(
+        assertEquals(
             directory {
                 directory("one") {
                     directory("two") {
                         directory("three")
                     }
                 }
-            }
-        ).isEqualTo(
+            },
             """
             ╰── one
                 ╰── two
@@ -113,7 +106,7 @@ class DirectoryBuilderTest {
     @Test
     @DisplayName("Multiple nested directories")
     fun multipleNestedDirectories() {
-        expectThat(
+        assertEquals(
             directory {
                 directory("one") {
                     directory("one_one") {
@@ -135,8 +128,7 @@ class DirectoryBuilderTest {
                         directory("two_two_two")
                     }
                 }
-            }
-        ).isEqualTo(
+            },
             """
             ├── one
             │   ├── one_one
@@ -159,7 +151,7 @@ class DirectoryBuilderTest {
     @Test
     @DisplayName("Non-uniform directories")
     fun nonUniformDirectories() {
-        expectThat(
+        assertEquals(
             directory {
                 directory("one") {
                     directory("one_one")
@@ -176,8 +168,7 @@ class DirectoryBuilderTest {
                         directory("two_one_one")
                     }
                 }
-            }
-        ).isEqualTo(
+            },
             """
             ├── one
             │   ├── one_one
@@ -196,14 +187,13 @@ class DirectoryBuilderTest {
     @Test
     @DisplayName("File then directory")
     fun fileThenDirectory() {
-        expectThat(
+        assertEquals(
             directory {
                 file("file_one.txt")
                 directory("directory") {
                     file("file_two.txt")
                 }
-            }
-        ).isEqualTo(
+            },
             """
             ├── file_one.txt
             ╰── directory
@@ -215,14 +205,13 @@ class DirectoryBuilderTest {
     @Test
     @DisplayName("Directory then file")
     fun directoryThenFile() {
-        expectThat(
+        assertEquals(
             directory {
                 directory("directory") {
                     file("file_two.txt")
                 }
                 file("file_one.txt")
-            }
-        ).isEqualTo(
+            },
             """
             ├── directory
             │   ╰── file_two.txt
@@ -234,13 +223,12 @@ class DirectoryBuilderTest {
     @Test
     @DisplayName("Shorthand directories")
     fun shorthandDirectories() {
-        expectThat(
+        assertEquals(
             directory {
                 directory("one", "two", "three") {
                     file("file.txt")
                 }
-            }
-        ).isEqualTo(
+            },
             """
             ╰── one
                 ╰── two
@@ -253,11 +241,10 @@ class DirectoryBuilderTest {
     @Test
     @DisplayName("Shorthand files")
     fun shorthandFiles() {
-        expectThat(
+        assertEquals(
             directory {
                 file("one", "two", "three", "file.txt")
-            }
-        ).isEqualTo(
+            },
             """
             ╰── one
                 ╰── two
@@ -270,7 +257,7 @@ class DirectoryBuilderTest {
     @Test
     @DisplayName("Custom separators")
     fun customSeparators() {
-        expectThat(
+        assertEquals(
             directory(
                 DirectoryContext(
                     separators = Separators(
@@ -287,8 +274,7 @@ class DirectoryBuilderTest {
                 directory("two") {
                     file("file.txt")
                 }
-            }
-        ).isEqualTo(
+            },
             """
             ╟─╴one
             ║  ╙─╴file.txt
@@ -314,7 +300,7 @@ class DirectoryBuilderTest {
     @MethodSource
     @DisplayName("Sort by name & directoriesFirst")
     fun sortByNameAndDirectoriesFirst(sortMode: SortMode, directoriesFirst: Boolean) {
-        expectThat(
+        assertEquals(
             directory(
                 context = DirectoryContext(
                     sortMode = sortMode,
@@ -330,8 +316,7 @@ class DirectoryBuilderTest {
                     }
                 }
                 file("a.txt")
-            }
-        ).isEqualTo(
+            },
             when (directoriesFirst) {
                 true -> when (sortMode) {
                     SortMode.NONE -> """
@@ -403,15 +388,14 @@ class DirectoryBuilderTest {
         @EnumSource
         @DisplayName("Directories only")
         fun directory(compactMode: CompactMode) {
-            expectThat(
+            assertEquals(
                 directory(
                     DirectoryContext(compactMode = compactMode)
                 ) {
                     directory("one") {
                         directory("two", "three")
                     }
-                }
-            ).isEqualTo(
+                },
                 when (compactMode) {
                     CompactMode.NONE -> """
                         ╰── one
@@ -436,15 +420,14 @@ class DirectoryBuilderTest {
         @EnumSource
         @DisplayName("File in a directory")
         fun fileInDirectory(compactMode: CompactMode) {
-            expectThat(
+            assertEquals(
                 directory(
                     DirectoryContext(compactMode = compactMode)
                 ) {
                     directory("one") {
                         file("two", "three", "file.txt")
                     }
-                }
-            ).isEqualTo(
+                },
                 when (compactMode) {
                     CompactMode.NONE -> """
                         ╰── one
@@ -471,13 +454,12 @@ class DirectoryBuilderTest {
         @EnumSource
         @DisplayName("File in the root directory")
         fun fileInRoot(compactMode: CompactMode) {
-            expectThat(
+            assertEquals(
                 directory(
                     DirectoryContext(compactMode = compactMode)
                 ) {
                     file("one", "two", "three", "file.txt")
-                }
-            ).isEqualTo(
+                },
                 when (compactMode) {
                     CompactMode.NONE -> """
                         ╰── one
@@ -503,7 +485,7 @@ class DirectoryBuilderTest {
         @EnumSource
         @DisplayName("Complex hierarchy")
         fun complex(compactMode: CompactMode) {
-            expectThat(
+            assertEquals(
                 directory(
                     DirectoryContext(compactMode = compactMode)
                 ) {
@@ -523,8 +505,7 @@ class DirectoryBuilderTest {
                             }
                         }
                     }
-                }
-            ).isEqualTo(
+                },
                 when (compactMode) {
                     CompactMode.NONE -> """
                             ├── featureOne
@@ -617,7 +598,7 @@ class DirectoryBuilderTest {
         @Test
         @DisplayName("With shorthand expressions")
         fun withShorthandExpressions() {
-            expectThat(
+            assertEquals(
                 directory {
                     file("featureOne", "build.gradle.kts")
                     file("featureTwo", "build.gradle.kts")
@@ -629,14 +610,15 @@ class DirectoryBuilderTest {
                             file("sonarqube", "android.gradle.kts")
                         }
                     }
-                }
-            ).isEqualTo(expected)
+                },
+                expected
+            )
         }
 
         @Test
         @DisplayName("With mixed expressions")
         fun withMixedExpressions() {
-            expectThat(
+            assertEquals(
                 directory {
                     directory("featureOne") {
                         file("build.gradle.kts")
@@ -654,14 +636,15 @@ class DirectoryBuilderTest {
                             }
                         }
                     }
-                }
-            ).isEqualTo(expected)
+                },
+                expected
+            )
         }
 
         @Test
         @DisplayName("Without shorthand expressions")
         fun withoutShorthandExpressions() {
-            expectThat(
+            assertEquals(
                 directory {
                     directory("featureOne") {
                         file("build.gradle.kts")
@@ -693,8 +676,9 @@ class DirectoryBuilderTest {
                             }
                         }
                     }
-                }
-            ).isEqualTo(expected)
+                },
+                expected
+            )
         }
     }
 }
