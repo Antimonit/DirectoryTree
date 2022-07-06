@@ -6,7 +6,7 @@ orbs:
 jobs:
   build:
     docker:
-      - image: cimg/openjdk:8.0
+      - image: cimg/openjdk:8.0-browsers
     working_directory: ~/repo/directory-tree
     environment:
       JVM_OPTS: -Xmx3200m

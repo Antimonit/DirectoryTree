@@ -24,13 +24,6 @@ kotlin {
     }
     js(BOTH) {
         browser {
-            testTask {
-                useKarma {
-                    useFirefox()
-                    useChrome()
-                    useSafari()
-                }
-            }
             commonWebpackConfig {
                 cssSupport.enabled = true
             }
