@@ -1,14 +1,10 @@
+import org.gradle.kotlin.dsl.accessors.runtime.conventionOf
+
 plugins {
     kotlin("multiplatform")
     id("java-library")
     jacoco
     id("com.vanniktech.maven.publish")
-}
-
-tasks.jacocoTestReport {
-    reports {
-        xml.required.set(true)
-    }
 }
 
 mavenPublish {
@@ -56,5 +52,31 @@ kotlin {
         named("jsTest")
         named("nativeMain")
         named("nativeTest")
+    }
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+}
+tasks.jacocoTestReport {
+    dependsOn(tasks.named("jvmTest")) // tests are required to run before generating the report
+}
+
+tasks.named("jvmTest") {
+    extensions.configure(JacocoTaskExtension::class) {
+        setDestinationFile(File("$buildDir/jacoco/test.exec"))
+    }
+}
+
+val commonMain = kotlin.sourceSets["commonMain"].kotlin
+val jvmMain = kotlin.sourceSets["jvmMain"].kotlin
+
+tasks.jacocoTestReport {
+    sourceDirectories.setFrom(commonMain.srcDirs, jvmMain.srcDirs)
+    classDirectories.setFrom(sourceSets.map { it.output.classesDirs })
+
+    executionData(File(buildDir,"jacoco/jvmTest.exec"))
+    reports {
+        xml.required.set(true)
     }
 }
